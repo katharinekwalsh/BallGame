@@ -14,7 +14,7 @@ import static java.lang.Thread.*;
 public class World extends JPanel{
 
 	private static ArrayList<Ball> ballArray;
-	static int INIT_WORLD_SIZE_X = 400;
+	static int INIT_WORLD_SIZE_X = 425;
 	static int INIT_WORLD_SIZE_Y = 450;
 	static int BALL_WORLD_BOUND_X = 400;
 	static int BALL_WORLD_BOUND_Y = 350;
