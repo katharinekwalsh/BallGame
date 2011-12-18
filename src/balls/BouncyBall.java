@@ -9,15 +9,15 @@ public class BouncyBall extends Ball{
 	
 	private static Random rand = new Random();
 	
-	public BouncyBall(int widthOfWorld, int heightOfWorld){
-		centerPointX = (int)(widthOfWorld*rand.nextDouble());
-		centerPointY = (int)(heightOfWorld*rand.nextDouble());
+	public BouncyBall(){
+		centerPointX = (int)(WORLD_WIDTH*rand.nextDouble());
+		centerPointY = (int)(WORLD_HEIGHT*rand.nextDouble());
 		radius = BOUNCY_RADIUS;		
 		velocityX = genRandVelocity();
 		velocityY = genRandVelocity();
 		inMotion = true;
 		
-		System.out.println("ball velX: "+velocityX+" velY: "+velocityY);
+		//System.out.println("ball velX: "+velocityX+" velY: "+velocityY);
 	
 	}
 	
@@ -39,7 +39,7 @@ public class BouncyBall extends Ball{
 				(int)(2*radius));
 	}
 	
-	public void move(int boundaryX, int boundaryY){
+	public void move(){
 		
 		
 		centerPointX += velocityX;
@@ -49,8 +49,8 @@ public class BouncyBall extends Ball{
 			centerPointX = (int)radius;
 			velocityX = -velocityX;
 		}
-		if(centerPointX +radius > boundaryX){
-			centerPointX = (int)(boundaryX - radius);
+		if(centerPointX +radius > WORLD_WIDTH){
+			centerPointX = (int)(WORLD_WIDTH - radius);
 			velocityX = -velocityX;
 		}
 		if(centerPointY - radius < 0){
@@ -58,15 +58,45 @@ public class BouncyBall extends Ball{
 			velocityY = -velocityY;
 		}
 		//should Stop when hits the ground
-		if(centerPointY + radius> boundaryY){
-			centerPointY = (int)(boundaryY - radius);
+		if(centerPointY + radius> WORLD_HEIGHT){
+			centerPointY = (int)(WORLD_HEIGHT - radius);
 			velocityY = -velocityY;
 		}
 	}
 	
 	public void collide(Ball other){
 		
-		other.collide(this);
+		if(other instanceof GrowBall){
+			other.collide(this);
+		}else{
+			//line through each balls center;
+			//this is the line around which the collision reflects
+			double tanX = other.centerPointX-centerPointX;
+			double tanY = other.centerPointY-centerPointY;
+			double tanLen = Math.sqrt(Math.pow(tanX, 2.0)+Math.pow(tanY, 2.0));
+			//original velocity vector length
+			double velLen = Math.sqrt(Math.pow(other.velocityX, 2.0)+
+					Math.pow(other.velocityY, 2.0));
+				
+			//using unit vectors
+			tanX = tanX/tanLen;
+			tanY = tanY/tanLen;
+			double d_u_velX = (other.velocityX*1.0)/velLen;
+			double d_u_velY = (other.velocityY*1.0)/velLen;
+			
+			//vector addition with unit vectors for new direction
+			double newX = d_u_velX + 2.0*tanX;
+			double newY = d_u_velY + 2.0*tanY;
+			
+			double scaleFactor = 
+					velLen/(Math.sqrt(Math.pow(newX, 2.0)+Math.pow(newY, 2.0)));
+			
+			//Shouldn't be zero..
+			scaleFactor = Math.ceil(scaleFactor);
+			
+			other.velocityX = (int)(newX*scaleFactor);
+			other.velocityY = (int)(newY*scaleFactor);
+		}
 		
 		//line through each balls center;
 		//this is the line around which the collision reflects

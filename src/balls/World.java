@@ -14,16 +14,25 @@ import static java.lang.Thread.*;
 public class World extends JPanel{
 
 	private static ArrayList<Ball> ballArray;
-	static int INIT_WORLD_SIZE_X = 425;
-	static int INIT_WORLD_SIZE_Y = 450;
-	static int BALL_WORLD_BOUND_X = 400;
-	static int BALL_WORLD_BOUND_Y = 350;
-	static int INIT_GROWBALL_SIZE = 2;
-	static int areaUsed;
+	public static int INIT_WORLD_SIZE_X = 425;
+	public static int INIT_WORLD_SIZE_Y = 450;
+	public static int BALL_WORLD_BOUND_X = 400;
+	public static int BALL_WORLD_BOUND_Y = 350;
+	public static int INIT_GROWBALL_SIZE = 2;
+	public static int ballArea;
+	public static int areaUsed;
+	public static int levelCount;
+	public static boolean levelWon;
+	public static String instr;
+	public static HashMap<Integer,String> levelMsg;
 	
 	public World(){
 		super();
 		ballArray = new ArrayList<Ball>();
+		levelCount = 1;
+		levelWon = true;
+		levelMsg = new HashMap<Integer,String>();
+		levelMsg.put(1, "Fill 60% of the space to get to the next level.");
 	}
 	
 	/**
@@ -36,7 +45,7 @@ public class World extends JPanel{
 	    	b.draw(g);
 	    		
 	    g.setColor(Color.black);
-	    g.drawString(" Level 1 You can't die yet.", 0, 370);
+	    g.drawString(" Level "+levelCount+": "+levelMsg.get(1), 0, 370);
 	    g.drawString(" "+areaUsed+"%", 0, 390);
 	    this.getBorder().paintBorder(this, g,
 	    		0,0,BALL_WORLD_BOUND_X,BALL_WORLD_BOUND_Y);
@@ -76,12 +85,17 @@ public class World extends JPanel{
 		world.addMouseListener(listener);
 		world.addMouseMotionListener(listener);
 		
-		//add first balls
-		ballArray.add(new BouncyBall(BALL_WORLD_BOUND_X,BALL_WORLD_BOUND_Y));
+		Ball.setWorldHeight(BALL_WORLD_BOUND_Y);
+		Ball.setWorldWidth(BALL_WORLD_BOUND_X);
 
-		int ballArea;
+		
 		while(true){
 		
+			//Init Level
+			if(levelWon)
+				initLevel();
+			
+			
 			try {
 				//Replace with Timer
 				sleep(1000/40);
@@ -95,7 +109,7 @@ public class World extends JPanel{
 			for(Ball ball : ballArray){
 				//Make the balls do something...
 				if(ball.inMotion){
-					ball.move(BALL_WORLD_BOUND_X,BALL_WORLD_BOUND_Y);
+					ball.move();
 				}else{
 					ball.grow();
 				}
@@ -105,18 +119,34 @@ public class World extends JPanel{
 			
 			areaUsed = (ballArea*100)/world.worldArea();
 			
-			//check and handle collisions..
-			for(int i = 0; i<ballArray.size(); i++){
-				for(int j = i+1; j<ballArray.size(); j++){
-					if(ballArray.get(i).collision(ballArray.get(j))){
-						ballArray.get(i).collide(ballArray.get(j));
-						//ballArray.get(j).collide(ballArray.get(i));
+			if(areaUsed > 60){
+				levelCount++;
+				areaUsed = 0;
+				levelWon = true;
+			}else{
+				//check and handle collisions..
+				for(int i = 0; i<ballArray.size(); i++){
+					for(int j = i+1; j<ballArray.size(); j++){
+						if(ballArray.get(i).collision(ballArray.get(j))){
+							ballArray.get(i).collide(ballArray.get(j));
+						}
 					}
 				}
+				universe.repaint();
 			}
-			universe.repaint();
+		}
+	}
+
+	private static void initLevel() {
+		if(!ballArray.isEmpty()){
+			ballArray.clear();
 		}
 		
+		for(int i = 0; i<levelCount; i++){
+			ballArray.add(new BouncyBall());
+		}
+		
+		levelWon = false;
 	}
 	
 }

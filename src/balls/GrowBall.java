@@ -37,15 +37,18 @@ public class GrowBall extends Ball{
 		centerPointY = y;
 	}
 	
-	public void move(int boundaryX, int boundaryY){
+	public void move(){
 		
 		//always scale back X range of movement
 		centerPointX += velocityX;
 		centerPointY += velocityY;
 		
+		System.out.println("move vX: "+velocityX+" vY: "+velocityY);
+		
+		
 		//right boundary
-		if(centerPointX + radius > boundaryX){
-			centerPointX = (int)(boundaryX - radius);
+		if(centerPointX + radius > WORLD_WIDTH){
+			centerPointX = (int)(WORLD_WIDTH - radius);
 			velocityX = -velocityX;
 		}
 		//left boundary
@@ -55,8 +58,8 @@ public class GrowBall extends Ball{
 		}
 		
 		//Hit the ground
-		if(centerPointY + radius> boundaryY){
-			centerPointY = (int)(boundaryY - radius);
+		if(centerPointY + radius> WORLD_HEIGHT){
+			centerPointY = (int)(WORLD_HEIGHT - radius);
 			velocityY = -velocityY;
 			bounced = true;
 		}
@@ -66,7 +69,7 @@ public class GrowBall extends Ball{
 			velocityY *= BALL_BOUNCE_DEC;
 			
 		//falling	
-		}else if(!bounced && (centerPointY + radius) < boundaryY) {
+		}else if(!bounced && (centerPointY + radius) < WORLD_HEIGHT) {
 			velocityY+= 1;
 		}
 		
@@ -98,13 +101,16 @@ public class GrowBall extends Ball{
 			
 			other.velocityX = otherVX;
 			other.velocityY = otherVY;
+			System.out.println("other vX: "+other.velocityX+" vY: "+other.velocityY);
 		}
 		
 		velocityX = thisVX;
 		velocityY = thisVY;
-		
-		
+		System.out.println("this vX: "+velocityX+" vY: "+velocityY);
 	}
+		
+		
+	
 	
 	public int collide(int initVelocityA, int initVelocityB, 
 						double radiusA, double radiusB){

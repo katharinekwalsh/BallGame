@@ -5,15 +5,17 @@ import java.awt.geom.Point2D;
 
 public abstract class Ball {
 	
-	public double PI = 3.14;
 	public boolean inMotion;
 	public int centerPointX;
 	public int centerPointY;
 	public int velocityX;
 	public int velocityY;
 	public double radius;
+	public static double PI = 3.14;
+	public static int WORLD_HEIGHT;
+	public static int WORLD_WIDTH;
 	public abstract void draw(Graphics g);
-	public abstract void move(int boundaryX, int boundaryY);
+	public abstract void move();
 	public abstract void collide(Ball other);
 	public abstract void grow();
 	
@@ -26,6 +28,14 @@ public abstract class Ball {
 	
 	public int area(){
 		return (int)(this.radius*this.radius*PI);
+	}
+	
+	public static void setWorldHeight(int height){
+		WORLD_HEIGHT = height;
+	}
+	
+	public static void setWorldWidth(int width){
+		WORLD_WIDTH = width;
 	}
 	
 	
